@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>3 DES DEMO</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href="skeleton.css" >
+    <link rel='stylesheet' type='text/css' media='screen' href="static/skeleton.css">
     <style>
-        body
-        {
+        body {
             margin: auto;
             padding: 0;
             width: 100vw;
@@ -16,31 +16,50 @@
             background-color: #333;
             display: flex;
             align-items: center;
-            
+            justify-content: space-evenly;
+            align-content: space-around;
+            flex-wrap: wrap;
+            flex-direction: column;
         }
 
-        .main
-        {
+
+
+        .main {
             width: 50%;
             height: 90%;
             background-color: rgba(173, 173, 173, 0.849);
-            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            align-content: space-around;
+            flex-wrap: wrap;
+            flex-direction: column;
 
         }
     </style>
-    <script src="crypto-js.min.js"></script>
-    <script ></script>
+    <script src="static/crypto-js.min.js"></script>
+    <script></script>
 </head>
-<body>
-    <div class="container main">
 
+<body>
+    <h1 style="color: aliceblue;font-family: fantasy;"> 3 DES DEMO</h1>
+    <div class="container main">
+        <!--  -->
+        <br>
+        <button type="button">Set encryption keys</button>
+        <div>
+            <input type="text" style="border: none;width: 500px;height: 40px;" placeholder="Enter a message ..." />
+            <button type="button">Send</button>
+        </div>
+        <br>
+        <label for="">RECEIVED MESSAGES</label>
+        <div style="width: 70%;
+        height: 200px;
+        box-shadow: 0.5px 0.5px 16px -2px #33333342;
+        background-color: #33333317;">
+
+        </div>
     </div>
 </body>
+
 </html>
-
-
-
-
-
-
-
