@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</head>
+<body>
+  <script>
+    function encrypt3DES(message, keys) {
+      // Generate a random initialization vector (IV)
+      const iv = CryptoJS.lib.WordArray.random(8);
+
+      // Convert the keys to WordArray format
+      const key1 = CryptoJS.enc.Utf8.parse(keys[0]);
+      const key2 = CryptoJS.enc.Utf8.parse(keys[1]);
+      const key3 = CryptoJS.enc.Utf8.parse(keys[2]);
+
+      // Create a 3DES cipher object with the three keys and the IV
+      const cipher = CryptoJS.TripleDES.encrypt(message, key1, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+        keySize: 24
+      });
+
+      // Concatenate the IV and ciphertext
+      const ciphertext = iv.concat(cipher.ciphertext);
+
+      // Return the ciphertext as a hexadecimal string
+      return ciphertext.toString();
+    }
+
+    function decrypt3DES(ciphertext, keys) {
+      // Convert the keys to WordArray format
+      const key1 = CryptoJS.enc.Utf8.parse(keys[0]);
+      const key2 = CryptoJS.enc.Utf8.parse(keys[1]);
+      const key3 = CryptoJS.enc.Utf8.parse(keys[2]);
+
+      // Extract the IV from the ciphertext
+      const iv = CryptoJS.enc.Hex.parse(ciphertext.substr(0, 16));
+
+      // Remove the IV from the ciphertext
+      const encrypted = ciphertext.substr(16);
+
+      // Create a 3DES cipher object with the three keys and the IV
+      const cipher = CryptoJS.TripleDES.decrypt(
+        { ciphertext: CryptoJS.enc.Hex.parse(encrypted) },
+        key1,
+        {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7,
+          keySize: 24
+        }
+      );
+
+      // Return the decrypted message as a UTF-8 string
+      return cipher.toString(CryptoJS.enc.Utf8);
+    }
+
+    // Example usage
+    const message = 'This is a secret message';
+    const keys = ['key1key1', 'key2key2', 'key3key3'];
+
+    // Encryption
+    const ciphertext = encrypt3DES(message, keys);
+    console.log('Ciphertext:', ciphertext);
+
+    // Decryption
+    const decryptedMessage = decrypt3DES(ciphertext, keys);
+    console.log('Decrypted message:', decryptedMessage);
+  </script>
+</body>
+</html>
