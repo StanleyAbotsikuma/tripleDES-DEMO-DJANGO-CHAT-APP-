@@ -38,18 +38,18 @@
         }
     </style>
     <script src="static/crypto-js.min.js"></script>
-    <script></script>
+    
 </head>
 
 <body>
-    <h1 style="color: aliceblue;font-family: fantasy;"> 3 DES DEMO</h1>
+    <h1 style="color: aliceblue;font-family: fantasy;"> 3 DES DEMO -</h1>
     <div class="container main">
         <!--  -->
         <br>
         <button type="button">Set encryption keys</button>
         <div>
-            <input type="text" style="border: none;width: 500px;height: 40px;" placeholder="Enter a message ..." />
-            <button type="button">Send</button>
+            <input type="text" style="border: none;width: 500px;height: 40px;" placeholder="Enter a message ..." id="messageInput" />
+            <button type="button" onclick="sendMessage()">Send</button>
         </div>
         <br>
         <label for="">RECEIVED MESSAGES</label>
@@ -57,9 +57,40 @@
         height: 200px;
         box-shadow: 0.5px 0.5px 16px -2px #33333342;
         background-color: #33333317;">
+            <p id="decoded">
 
+            </p>
         </div>
+
+        <br>
+        <button type="button">Detail</button>
     </div>
 </body>
+<script>
+var socket = new WebSocket("ws://localhost:8000/ws/message_demo/");
 
+      // Event handlers
+      socket.onopen = function(event) {
+        console.log("WebSocket connection established.");
+      };
+
+      socket.onmessage = function(event) {
+        console.log("Received message:", event.data);
+        
+        document.getElementById("decoded").value=JSON.parse(event.data).message;
+      };
+
+      socket.onclose = function(event) {
+        console.log("WebSocket connection closed.");
+      };
+    
+
+    function sendMessage() {
+      var message = document.getElementById("messageInput").value;
+      socket.send( JSON.stringify({'encrypted_message':message}));
+      document.getElementById("messageInput").value="";
+    }
+
+
+</script>
 </html>
