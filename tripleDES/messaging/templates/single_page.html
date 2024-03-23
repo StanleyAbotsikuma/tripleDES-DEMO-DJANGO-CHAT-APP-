@@ -166,7 +166,12 @@
       }
       else  if(JSON.parse(event.data).type=="key")
       {
-       console.log(JSON.parse(event.data).message[0])
+
+   
+       document.getElementById("key1").value = JSON.parse(event.data).message[0];
+       document.getElementById("key2").value = JSON.parse(event.data).message[1];
+       document.getElementById("key3").value = JSON.parse(event.data).message[2];
+       
       }
      
     };
@@ -184,7 +189,7 @@
   
     function sendKey() {
         
-        socket.send( JSON.stringify({'type': 'key','message':["sdfsd","sdfsdf","sdfsdfdfs"]}));
+        socket.send( JSON.stringify({'type': 'key','message':[document.getElementById("key1").value,document.getElementById("key2").value,document.getElementById("key3").value]}));
        
       }
   
