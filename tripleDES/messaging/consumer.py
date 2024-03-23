@@ -28,7 +28,7 @@ class MessagingConsumer(AsyncWebsocketConsumer):
 
         else:
              await self.channel_layer.group_send(
-                self.messaging_channel, {"type": "send_keys", "message": message}
+                self.messaging_channel, {"type": "send_keys", "message":  text_data_json["message"]}
             )
 
     # Receive message from room group

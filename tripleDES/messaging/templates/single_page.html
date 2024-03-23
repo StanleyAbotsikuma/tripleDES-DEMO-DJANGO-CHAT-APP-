@@ -95,7 +95,9 @@
     <div style="width: 70%;
         height: 200px;
         box-shadow: 0.5px 0.5px 16px -2px #33333342;
-        background-color: #33333317;">
+        background-color: #33333317;display: flex;
+        align-items: center;
+        justify-content: center;s">
       <p id="decoded">
 
       </p>
@@ -157,9 +159,16 @@
     };
   
     socket.onmessage = function (event) {
-      console.log("Received message:", JSON.parse(event.data).message);
-  
-      document.getElementById("decoded").innerHTML = JSON.parse(event.data).message;
+      console.log("Received message:", JSON.parse(event.data));
+      if(JSON.parse(event.data).type=="message")
+      {
+        JSON.parse(event.data).sender !=device?document.getElementById("decoded").innerHTML = JSON.parse(event.data).message:null ;
+      }
+      else  if(JSON.parse(event.data).type=="key")
+      {
+       console.log(JSON.parse(event.data).message[0])
+      }
+     
     };
   
     socket.onclose = function (event) {
