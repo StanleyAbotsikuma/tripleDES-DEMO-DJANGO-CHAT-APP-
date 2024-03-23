@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 
@@ -6,99 +7,220 @@
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
   <title>3 DES DEMO</title>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <link rel='stylesheet' type='text/css' media='screen' href="static/skeleton.css">
+  <link rel='stylesheet' type='text/css' media='screen' href="/static/skeleton.css">
   <style>
     body {
-      margin: auto;
+      margin: 0;
       padding: 0;
-      width: 100vw;
-      height: 100vh;
       background-color: #333;
       display: flex;
       align-items: center;
-      justify-content: space-evenly;
-      align-content: space-around;
-      flex-wrap: wrap;
-      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
     }
-
-
 
     .main {
-      width: 50%;
-      height: 90%;
+      width: 90%;
+      max-width: 500px;
+      height: 100%;
       background-color: rgba(173, 173, 173, 0.849);
       display: flex;
-      align-items: center;
-      justify-content: space-evenly;
-      align-content: space-around;
-      flex-wrap: wrap;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
 
+    .main h1 {
+      color: #333;
+      font-family: fantasy;
+      margin-top: 0;
+    }
+
+    .input-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+
+    .input-container label {
+      color: #333;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .input-container input {
+      width: 100%;
+      height: 40px;
+      border: none;
+      border-radius: 4px;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .button-container button {
+      flex: 1;
+      height: 40px;
+      border: none;
+      border-radius: 4px;
+      background-color: #333;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .received-messages {
+      width: 100%;
+      height: 200px;
+      box-shadow: 0.5px 0.5px 16px -2px #33333342;
+      background-color: #33333317;
+      overflow: auto;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .close {
+      color: #888;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
     }
   </style>
-  <script src="static/crypto-js.min.js"></script>
-
+  <script src="/static/crypto-js.min.js"></script>
 </head>
 
 <body>
-  <h1 style="color: aliceblue;font-family: fantasy;"> 3 DES DEMO -</h1>
-  <div class="container main">
-    <!--  -->
-    <br>
-    <button type="button" onclick="sendKey()">Set encryption keys</button>
-    <div>
-      <input type="text" style="border: none;width: 500px;height: 40px;" placeholder="Enter a message ..."
-        id="messageInput" />
+  <div class="main">
+    <h1>3 DES DEMO</h1>
+    <div class="input-container">
+      <label for="messageInput">Enter a message:</label>
+      <input type="text" id="messageInput" placeholder="Enter a message ..." />
+    </div>
+    <div class="button-container">
+      <button type="button" onclick="openModal()">Set encryption keys</button>
       <button type="button" onclick="sendMessage()">Send</button>
     </div>
-    <br>
-    <label for="">RECEIVED MESSAGES</label>
-    <div style="width: 70%;
-        height: 200px;
-        box-shadow: 0.5px 0.5px 16px -2px #33333342;
-        background-color: #33333317;">
-      <p id="decoded">
-
-      </p>
+    <div class="received-messages">
+      <label for="">RECEIVED MESSAGES</label>
+      <p id="decoded"></p>
     </div>
-
-    <br>
     <button type="button">Detail</button>
   </div>
-</body>
-<script>
-  let device = "mobile";
-  var socket = new WebSocket("ws://localhost:8000/ws/message_demo/");
 
-  // Event handlers
-  socket.onopen = function (event) {
-    console.log("WebSocket connection established.");
-  };
+  <!-- Modal -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Set Encryption Keys</h2>
+      <div class="input-container">
+        <label for="key1">Key 1:</label>
+        <input type="text" id="key1" />
+      </div>
+      <div class="input-container">
+        <label for="key2">Key 2:</label>
+        <input type="text" id="key2" />
+      </div>
+      <div class="input-container">
+        <label for="key3">Key 3:</label>
+        <input type="text" id="key3" />
+      </div>
+      <button type="button" onclick="closeModal()">Done</button>
+    </div>
+  </div>
 
-  socket.onmessage = function (event) {
-    console.log("Received message:", JSON.parse(event.data).message);
-
-    document.getElementById("decoded").innerHTML = JSON.parse(event.data).message;
-  };
-
-  socket.onclose = function (event) {
-    console.log("WebSocket connection closed.");
-  };
-
-
-  function sendMessage() {
-    var message = document.getElementById("messageInput").value;
-    socket.send(JSON.stringify({'type': 'message' ,'sender': device , 'encrypted_message': message }));
-    document.getElementById("messageInput").value = "";
-  }
-
-  function sendKey() {
-      
-      socket.send( JSON.stringify({'type': 'key','message':["sdfsd","sdfsdf","sdfsdfdfs"]}));
-     
+  <script>
+    // Modal functionality
+    function openModal() {
+      var modal = document.getElementById("myModal");
+      modal.style.display = "block";
     }
 
-</script>
+    function closeModal() {
+      var modal = document.getElementById("myModal");
+      modal.style.display = "none";
+    }
+
+    window.onclick = function (event) {
+      var modal = document.getElementById("myModal");
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    };
+  
+
+    
+    let device = "mobile";
+    var socket = new WebSocket("ws://localhost:8000/ws/message_demo/");
+  
+    // Event handlers
+    socket.onopen = function (event) {
+      console.log("WebSocket connection established.");
+    };
+  
+    socket.onmessage = function (event) {
+      console.log("Received message:", JSON.parse(event.data).message);
+  
+      document.getElementById("decoded").innerHTML = JSON.parse(event.data).message;
+    };
+  
+    socket.onclose = function (event) {
+      console.log("WebSocket connection closed.");
+    };
+  
+  
+    function sendMessage() {
+      var message = document.getElementById("messageInput").value;
+      socket.send(JSON.stringify({'type': 'message' ,'sender': device , 'encrypted_message': message }));
+      document.getElementById("messageInput").value = "";
+    }
+  
+    function sendKey() {
+        
+        socket.send( JSON.stringify({'type': 'key','message':["sdfsd","sdfsdf","sdfsdfdfs"]}));
+       
+      }
+  
+  </script>
+</body>
 
 </html>
