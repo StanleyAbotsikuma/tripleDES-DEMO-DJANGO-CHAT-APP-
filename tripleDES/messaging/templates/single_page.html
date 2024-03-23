@@ -129,7 +129,7 @@
 
   <script>
 
-    let en_message="";
+    let en_message = "";
     // Modal functionality
     function openModal() {
       var modal = document.getElementById("myModal");
@@ -137,9 +137,9 @@
     }
     function closeModalDone() {
       var modal = document.getElementById("myModal");
-      sendKey() ;
+      sendKey();
       modal.style.display = "none";
-      
+
     }
     function closeModal() {
       var modal = document.getElementById("myModal");
@@ -156,7 +156,7 @@
 
 
 
-   
+
 
     function asciiToBinary(string) {
       var binaryString = '';
@@ -170,7 +170,7 @@
     function desEncrypt(plainText, key) {
       var encrypted = CryptoJS.DES.encrypt(plainText, key, {
         mode: CryptoJS.mode.CBC,  // Use CBC mode for better security
-        iv: CryptoJS.lib.WordArray.random(8)  
+        iv: CryptoJS.lib.WordArray.random(8)
       });
       return encrypted.toString();
     }
@@ -218,7 +218,7 @@
 
 
     let device = "web";
-    var socket = new WebSocket("ws://"+window.location.host+"/ws/message_demo/");
+    var socket = new WebSocket("ws://" + window.location.host + "/ws/message_demo/");
 
     // Event handlers
     socket.onopen = function (event) {
@@ -229,10 +229,10 @@
       console.log("Received message:", JSON.parse(event.data));
       if (JSON.parse(event.data).type == "message") {
         en_message = JSON.parse(event.data).message;
-        JSON.parse(event.data).sender != device ? document.getElementById("decoded").innerHTML =tripleDesDecrypt(JSON.parse(event.data).message, 
-        document.getElementById("key1").value, 
-        document.getElementById("key2").value, 
-        document.getElementById("key3").value)  : null;
+        JSON.parse(event.data).sender != device ? document.getElementById("decoded").innerHTML = tripleDesDecrypt(JSON.parse(event.data).message,
+          document.getElementById("key1").value,
+          document.getElementById("key2").value,
+          document.getElementById("key3").value) : null;
       }
       else if (JSON.parse(event.data).type == "key") {
 
@@ -255,10 +255,10 @@
       socket.send(JSON.stringify({
         'type': 'message',
         'sender': device,
-        'encrypted_message': tripleDesEncrypt(message, 
-        document.getElementById("key1").value, 
-        document.getElementById("key2").value, 
-        document.getElementById("key3").value)
+        'encrypted_message': tripleDesEncrypt(message,
+          document.getElementById("key1").value,
+          document.getElementById("key2").value,
+          document.getElementById("key3").value)
       }));
 
       document.getElementById("messageInput").value = "";
@@ -269,17 +269,16 @@
       socket.send(JSON.stringify({
         'type': 'key', 'message':
           [document.getElementById("key1").value,
-            document.getElementById("key2").value,
-            document.getElementById("key3").value]
+          document.getElementById("key2").value,
+          document.getElementById("key3").value]
       }));
 
     }
 
 
-    function Detail()
-{
-  alert(en_message);
-}
+    function Detail() {
+      alert(en_message);
+    }
   </script>
 </body>
 
