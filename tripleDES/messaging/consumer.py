@@ -19,16 +19,29 @@ class MessagingConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["encrypted_message"]
-
+        message = text_data_json["type"]
+        if message=="message":
         # Send message to room group
-        await self.channel_layer.group_send(
-            self.messaging_channel, {"type": "encrypted_message", "message": message}
-        )
+            await self.channel_layer.group_send(
+                self.messaging_channel, {"type": "send_message", "message": text_data_json["encrypted_message"],"sender": text_data_json["sender"]}
+            )
+
+        else:
+             await self.channel_layer.group_send(
+                self.messaging_channel, {"type": "send_keys", "message": message}
+            )
 
     # Receive message from room group
-    async def encrypted_message(self, event):
+    async def send_keys(self, event):
         message = event["message"]
-        print(message)
+        print(event)
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps({"type":"key","message": message}))
+
+
+    async def send_message(self, event):
+        message = event["message"]
+        sender = event["sender"]
+        print(event)
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({"type":"message","sender": sender,"message": message}))

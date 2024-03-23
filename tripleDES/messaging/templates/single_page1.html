@@ -46,7 +46,7 @@
   <div class="container main">
     <!--  -->
     <br>
-    <button type="button">Set encryption keys</button>
+    <button type="button" onclick="sendKey()">Set encryption keys</button>
     <div>
       <input type="text" style="border: none;width: 500px;height: 40px;" placeholder="Enter a message ..."
         id="messageInput" />
@@ -93,6 +93,11 @@
     document.getElementById("messageInput").value = "";
   }
 
+  function sendKey() {
+      
+      socket.send( JSON.stringify({'type': 'key','message':["sdfsd","sdfsdf","sdfsdfdfs"]}));
+     
+    }
 
 </script>
 
