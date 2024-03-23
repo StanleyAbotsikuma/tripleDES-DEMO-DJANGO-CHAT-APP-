@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>3 DES DEMO</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel='stylesheet' type='text/css' media='screen' href="static/skeleton.css">
+  <style>
+    body {
+      margin: auto;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      align-content: space-around;
+      flex-wrap: wrap;
+      flex-direction: column;
+    }
+
+
+
+    .main {
+      width: 50%;
+      height: 90%;
+      background-color: rgba(173, 173, 173, 0.849);
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      align-content: space-around;
+      flex-wrap: wrap;
+      flex-direction: column;
+
+    }
+  </style>
+  <script src="static/crypto-js.min.js"></script>
+
+</head>
+
+<body>
+  <h1 style="color: aliceblue;font-family: fantasy;"> 3 DES DEMO -</h1>
+  <div class="container main">
+    <!--  -->
+    <br>
+    <button type="button">Set encryption keys</button>
+    <div>
+      <input type="text" style="border: none;width: 500px;height: 40px;" placeholder="Enter a message ..."
+        id="messageInput" />
+      <button type="button" onclick="sendMessage()">Send</button>
+    </div>
+    <br>
+    <label for="">RECEIVED MESSAGES</label>
+    <div style="width: 70%;
+        height: 200px;
+        box-shadow: 0.5px 0.5px 16px -2px #33333342;
+        background-color: #33333317;">
+      <p id="decoded">
+
+      </p>
+    </div>
+
+    <br>
+    <button type="button">Detail</button>
+  </div>
+</body>
+<script>
+  let device = "mobile";
+  var socket = new WebSocket("ws://localhost:8000/ws/message_demo/");
+
+  // Event handlers
+  socket.onopen = function (event) {
+    console.log("WebSocket connection established.");
+  };
+
+  socket.onmessage = function (event) {
+    console.log("Received message:", JSON.parse(event.data).message);
+
+    document.getElementById("decoded").innerHTML = JSON.parse(event.data).message;
+  };
+
+  socket.onclose = function (event) {
+    console.log("WebSocket connection closed.");
+  };
+
+
+  function sendMessage() {
+    var message = document.getElementById("messageInput").value;
+    socket.send(JSON.stringify({'type': 'message' ,'sender': device , 'encrypted_message': message }));
+    document.getElementById("messageInput").value = "";
+  }
+
+
+</script>
+
+</html>

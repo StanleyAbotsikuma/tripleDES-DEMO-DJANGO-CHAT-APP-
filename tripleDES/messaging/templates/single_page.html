@@ -75,9 +75,9 @@ var socket = new WebSocket("ws://localhost:8000/ws/message_demo/");
       };
 
       socket.onmessage = function(event) {
-        console.log("Received message:", event.data);
+        console.log("Received message:", JSON.parse(event.data).message);
         
-        document.getElementById("decoded").value=JSON.parse(event.data).message;
+        document.getElementById("decoded").innerHTML="sdfsdfs";
       };
 
       socket.onclose = function(event) {
