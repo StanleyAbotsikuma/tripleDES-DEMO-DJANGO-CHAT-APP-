@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -48,16 +47,16 @@
       background-color: rgba(0, 0, 0, 0.5);
     }
 
-        .modal-content {
-    background-color: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
 
     }
 
@@ -97,7 +96,7 @@
         box-shadow: 0.5px 0.5px 16px -2px #33333342;
         background-color: #33333317;display: flex;
         align-items: center;
-        justify-content: center;s">
+        justify-content: center;">
       <p id="decoded">
 
       </p>
@@ -111,7 +110,7 @@
   <div id="myModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <h4>Set Encryption Keys</h4   >
+      <h4>Set Encryption Keys</h4>
       <div>
         <label for="key1">Key 1:</label>
         <input type="text" id="key1">
@@ -150,49 +149,121 @@
 
 
 
+   
+
+    function asciiToBinary(string) {
+      var binaryString = '';
+      for (var i = 0; i < string.length; i++) {
+        var binary = string[i].charCodeAt(0).toString(2);
+        binaryString += '0'.repeat(8 - binary.length) + binary;
+      }
+      return binaryString;
+    }
+
+    function desEncrypt(plainText, key) {
+      var encrypted = CryptoJS.DES.encrypt(plainText, key, {
+        mode: CryptoJS.mode.CBC,  // Use CBC mode for better security
+        iv: CryptoJS.lib.WordArray.random(8)  // Generate a random 8-byte IV for DES
+      });
+      return encrypted.toString();
+    }
+
+    function desDecrypt(encryptedText, key) {
+      var decrypted = CryptoJS.DES.decrypt(encryptedText, key, {
+        mode: CryptoJS.mode.CBC,
+        iv: encrypted.iv  // Extract the IV from the encrypted text
+      });
+      return decrypted.toString(CryptoJS.enc.Utf8);
+    }
+
+
+
+    // Triple DES encryption function
+    function tripleDesEncrypt(message, key1, key2, key3) {
+      // Convert the keys from ASCII to binary
+      key1 = asciiToBinary(key1);
+      key2 = asciiToBinary(key2);
+      key3 = asciiToBinary(key3);
+
+      // Perform the encryption
+      var encryptedMessage = desEncrypt(message, key1);
+      encryptedMessage = desDecrypt(encryptedMessage, key2);
+      encryptedMessage = desEncrypt(encryptedMessage, key3);
+
+      return encryptedMessage;
+    }
+
+    // Triple DES decryption function
+    function tripleDesDecrypt(encryptedMessage, key1, key2, key3) {
+      // Convert the keys from ASCII to binary
+      key1 = asciiToBinary(key1);
+      key2 = asciiToBinary(key2);
+      key3 = asciiToBinary(key3);
+
+      // Perform the decryption
+      var decryptedMessage = desDecrypt(encryptedMessage, key3);
+      decryptedMessage = desEncrypt(decryptedMessage, key2);
+      decryptedMessage = desDecrypt(decryptedMessage, key1);
+
+      return decryptedMessage;
+    }
+
+
+
     let device = "web";
     var socket = new WebSocket("ws://localhost:8000/ws/message_demo/");
-  
+
     // Event handlers
     socket.onopen = function (event) {
       console.log("WebSocket connection established.");
     };
-  
+
     socket.onmessage = function (event) {
       console.log("Received message:", JSON.parse(event.data));
-      if(JSON.parse(event.data).type=="message")
-      {
-        JSON.parse(event.data).sender !=device?document.getElementById("decoded").innerHTML = JSON.parse(event.data).message:null ;
+      if (JSON.parse(event.data).type == "message") {
+        JSON.parse(event.data).sender != device ? document.getElementById("decoded").innerHTML = JSON.parse(event.data).message : null;
       }
-      else  if(JSON.parse(event.data).type=="key")
-      {
+      else if (JSON.parse(event.data).type == "key") {
 
-   
-       document.getElementById("key1").value = JSON.parse(event.data).message[0];
-       document.getElementById("key2").value = JSON.parse(event.data).message[1];
-       document.getElementById("key3").value = JSON.parse(event.data).message[2];
-       
+
+        document.getElementById("key1").value = JSON.parse(event.data).message[0];
+        document.getElementById("key2").value = JSON.parse(event.data).message[1];
+        document.getElementById("key3").value = JSON.parse(event.data).message[2];
+
       }
-     
+
     };
-  
+
     socket.onclose = function (event) {
       console.log("WebSocket connection closed.");
     };
-  
-  
+
+
     function sendMessage() {
       var message = document.getElementById("messageInput").value;
-      socket.send(JSON.stringify({'type': 'message' ,'sender': device , 'encrypted_message': message }));
+      socket.send(JSON.stringify({
+        'type': 'message',
+        'sender': device,
+        'encrypted_message': tripleDesEncrypt(message, 
+        document.getElementById("key1").value, 
+        document.getElementById("key2").value, 
+        document.getElementById("key3").value)
+      }));
+
       document.getElementById("messageInput").value = "";
     }
-  
+
     function sendKey() {
-        
-        socket.send( JSON.stringify({'type': 'key','message':[document.getElementById("key1").value,document.getElementById("key2").value,document.getElementById("key3").value]}));
-       
-      }
-  
+
+      socket.send(JSON.stringify({
+        'type': 'key', 'message':
+          [document.getElementById("key1").value,
+            document.getElementById("key2").value,
+            document.getElementById("key3").value]
+      }));
+
+    }
+
   </script>
 </body>
 
