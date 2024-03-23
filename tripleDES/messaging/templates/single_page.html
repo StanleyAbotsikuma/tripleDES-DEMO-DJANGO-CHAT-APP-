@@ -75,7 +75,7 @@
       cursor: pointer;
     }
   </style>
-  <script src="static/crypto-js.min.js"></script>
+  <script src="/static/crypto-js.min.js"></script>
 </head>
 
 <body>
@@ -103,7 +103,7 @@
     </div>
 
     <br>
-    <button type="button">Detail</button>
+    <button type="button" onclick="Detail()">Detail</button>
   </div>
 
   <!-- Modal -->
@@ -123,17 +123,24 @@
         <label for="key3">Key 3:</label>
         <input type="text" id="key3">
       </div>
-      <button type="button" onclick="closeModal()">Done</button>
+      <button type="button" onclick="closeModalDone()">Done</button>
     </div>
   </div>
 
   <script>
+
+    let en_message="";
     // Modal functionality
     function openModal() {
       var modal = document.getElementById("myModal");
       modal.style.display = "block";
     }
-
+    function closeModalDone() {
+      var modal = document.getElementById("myModal");
+      sendKey() ;
+      modal.style.display = "none";
+      
+    }
     function closeModal() {
       var modal = document.getElementById("myModal");
       modal.style.display = "none";
@@ -163,7 +170,7 @@
     function desEncrypt(plainText, key) {
       var encrypted = CryptoJS.DES.encrypt(plainText, key, {
         mode: CryptoJS.mode.CBC,  // Use CBC mode for better security
-        iv: CryptoJS.lib.WordArray.random(8)  // Generate a random 8-byte IV for DES
+        iv: CryptoJS.lib.WordArray.random(8)  
       });
       return encrypted.toString();
     }
@@ -171,7 +178,7 @@
     function desDecrypt(encryptedText, key) {
       var decrypted = CryptoJS.DES.decrypt(encryptedText, key, {
         mode: CryptoJS.mode.CBC,
-        iv: encrypted.iv  // Extract the IV from the encrypted text
+        iv: CryptoJS.lib.WordArray.random(8)
       });
       return decrypted.toString(CryptoJS.enc.Utf8);
     }
@@ -211,7 +218,7 @@
 
 
     let device = "web";
-    var socket = new WebSocket("ws://localhost:8000/ws/message_demo/");
+    var socket = new WebSocket("ws://"+window.location.host+"/ws/message_demo/");
 
     // Event handlers
     socket.onopen = function (event) {
@@ -221,7 +228,11 @@
     socket.onmessage = function (event) {
       console.log("Received message:", JSON.parse(event.data));
       if (JSON.parse(event.data).type == "message") {
-        JSON.parse(event.data).sender != device ? document.getElementById("decoded").innerHTML = JSON.parse(event.data).message : null;
+        en_message = JSON.parse(event.data).message;
+        JSON.parse(event.data).sender != device ? document.getElementById("decoded").innerHTML =tripleDesDecrypt(JSON.parse(event.data).message, 
+        document.getElementById("key1").value, 
+        document.getElementById("key2").value, 
+        document.getElementById("key3").value)  : null;
       }
       else if (JSON.parse(event.data).type == "key") {
 
@@ -264,6 +275,11 @@
 
     }
 
+
+    function Detail()
+{
+  alert(en_message);
+}
   </script>
 </body>
 
