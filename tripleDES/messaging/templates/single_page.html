@@ -79,7 +79,7 @@
 </head>
 
 <body>
-  <h1 style="color: aliceblue;font-family: fantasy;"> 3 DES DEMO -</h1>
+  <h1 style="color: aliceblue;font-family: fantasy;"> 3 DES DEMO - FORTUNATE AYIEB</h1>
   <div class="container main">
     <!--  -->
     <br>
@@ -159,18 +159,20 @@
 
 
     function asciiToBinary(string) {
-      var binaryString = '';
-      for (var i = 0; i < string.length; i++) {
-        var binary = string[i].charCodeAt(0).toString(2);
-        binaryString += '0'.repeat(8 - binary.length) + binary;
-      }
-      return binaryString;
+      
+      return  CryptoJS.enc.Hex.parse(string);
     }
 
     function desEncrypt(plainText, key) {
       var encrypted = CryptoJS.DES.encrypt(plainText, key, {
         mode: CryptoJS.mode.CBC,  // Use CBC mode for better security
-        iv: CryptoJS.lib.WordArray.random(8)
+        iv: {
+          "words": [
+              4026103254,
+              201453218
+          ],
+          "sigBytes": 8
+      }
       });
       return encrypted.toString();
     }
@@ -178,7 +180,13 @@
     function desDecrypt(encryptedText, key) {
       var decrypted = CryptoJS.DES.decrypt(encryptedText, key, {
         mode: CryptoJS.mode.CBC,
-        iv: CryptoJS.lib.WordArray.random(8)
+        iv:{
+          "words": [
+              4026103254,
+              201453218
+          ],
+          "sigBytes": 8
+      }
       });
       return decrypted.toString(CryptoJS.enc.Utf8);
     }
@@ -194,7 +202,7 @@
 
       // Perform the encryption
       var encryptedMessage = desEncrypt(message, key1);
-      encryptedMessage = desDecrypt(encryptedMessage, key2);
+      encryptedMessage = desEncrypt(encryptedMessage, key2);
       encryptedMessage = desEncrypt(encryptedMessage, key3);
 
       return encryptedMessage;
@@ -209,7 +217,7 @@
 
       // Perform the decryption
       var decryptedMessage = desDecrypt(encryptedMessage, key3);
-      decryptedMessage = desEncrypt(decryptedMessage, key2);
+      decryptedMessage = desDecrypt(decryptedMessage, key2);
       decryptedMessage = desDecrypt(decryptedMessage, key1);
 
       return decryptedMessage;
@@ -229,7 +237,7 @@
       console.log("Received message:", JSON.parse(event.data));
       if (JSON.parse(event.data).type == "message") {
         en_message = JSON.parse(event.data).message;
-        JSON.parse(event.data).sender != device ? document.getElementById("decoded").innerHTML = tripleDesDecrypt(JSON.parse(event.data).message,
+        JSON.parse(event.data).sender != device ? document.getElementById("decoded").innerHTML = tripleDesDecrypt(en_message,
           document.getElementById("key1").value,
           document.getElementById("key2").value,
           document.getElementById("key3").value) : null;
